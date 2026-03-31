@@ -299,30 +299,30 @@ if (!dir.exists("raster_data")) dir.create("raster_data")
 result_SR <- simulate_and_loss(
   boundary, df_metrics_sf, "SR", cellsize_deg = cellsize_deg_30
 )
-saveRDS(result_SR, file.path("raster_data", "result_SR_loess_10fold.rds"))
-writeRaster(result_SR$raster,
-            file.path("raster_data", "SR_interpolated.tif"),
-            format = "GTiff", overwrite = TRUE)
+#saveRDS(result_SR, file.path("raster_data", "result_SR_loess_10fold.rds"))
+#writeRaster(result_SR$raster,
+#            file.path("raster_data", "SR_interpolated.tif"),
+#            format = "GTiff", overwrite = TRUE)
 
 # Interpolate spatial structural diversity (delta_Gini_spatial)
 result_delta_Gini_spatial <- simulate_and_loss(
   boundary, df_metrics_sf, "delta_Gini_spatial", cellsize_deg = cellsize_deg_30
 )
-saveRDS(result_delta_Gini_spatial,
-        file.path("raster_data", "result_delta_Gini_spatial_loess_10fold.rds"))
-writeRaster(result_delta_Gini_spatial$raster,
-            file.path("raster_data", "delta_Gini_spatial_interpolated.tif"),
-            format = "GTiff", overwrite = TRUE)
+#saveRDS(result_delta_Gini_spatial,
+#        file.path("raster_data", "result_delta_Gini_spatial_loess_10fold.rds"))
+#writeRaster(result_delta_Gini_spatial$raster,
+#            file.path("raster_data", "delta_Gini_spatial_interpolated.tif"),
+#            format = "GTiff", overwrite = TRUE)
 
 # Interpolate size structural diversity (Gini_size)
 result_Gini_size <- simulate_and_loss(
   boundary, df_metrics_sf, "Gini_size", cellsize_deg = cellsize_deg_30
 )
-saveRDS(result_Gini_size,
-        file.path("raster_data", "result_Gini_size_loess_10fold.rds"))
-writeRaster(result_Gini_size$raster,
-            file.path("raster_data", "Gini_size_interpolated.tif"),
-            format = "GTiff", overwrite = TRUE)
+#saveRDS(result_Gini_size,
+#        file.path("raster_data", "result_Gini_size_loess_10fold.rds"))
+#writeRaster(result_Gini_size$raster,
+#           file.path("raster_data", "Gini_size_interpolated.tif"),
+#           format = "GTiff", overwrite = TRUE)
 
 # ---------------------------
 # 5. Reload saved interpolation results
@@ -376,7 +376,7 @@ interpolation_plot <- (p_SR + p_delta_Gini_spatial + p_Gini_size) +
     )
   )
 
-ggsave("interpolation_results_3vars_10fold.pdf",
+ggsave("Fig. S4 interpolation_results_3vars_10fold.pdf",
        interpolation_plot, width = 22, height = 6, dpi = 300)
 
 # ============================================================
@@ -459,7 +459,7 @@ combined_plot <- p1 + p2
 print(combined_plot)
 
 ggsave(
-  filename = "Fig.S5.pdf",
+  filename = "Fig. S5 zonal.pdf",
   plot = combined_plot,
   width = 15,
   height = 5,
@@ -609,7 +609,7 @@ write_xlsx(
     "1000m" = df_1000_clean,
     "500m"  = df_500_clean
   ),
-  path = file.path("zonal_stats_all_scales.xlsx")
+  path = file.path("zonal_stats_all_scales.xlsx") # PROCESS DATA
 )
 
 cat("Saving GeoPackage outputs...\n")
