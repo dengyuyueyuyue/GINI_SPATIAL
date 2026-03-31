@@ -17,7 +17,10 @@
 #                 Spatial Gini Coefficient (n = 110 quadrats)
 #    · Fig. S3  — Scatter plot: ΔGini_spatial vs. Gini_size
 #                 Includes linear regression and Spearman correlation
-#    · Table S1 — Mean ± SD of LAC (Spatial vs. Size-based)
+#    · Table S1 — Mean ± SD of Gini coefficients
+#                 (Observed Gini_spatial, Simulated Gini_spatial,
+#                  Gini_size)
+#    · Table S2 — Mean ± SD of LAC (Spatial vs. Size-based)
 #
 #  Statistical tests:
 #    - Paired Wilcoxon signed-rank test (Fig. S2)
@@ -41,7 +44,7 @@ library(ggplot2)
 library(scales)
 
 # Output directory for all figures and tables
-save_dir <- "F:/DYY-博士论文/1. QY_SAR/QY_SAR_PROJECT/5. 小论文工作/5.4 性状数据的获取/QYS_QYS_物种名称纠正/小论文结果数据1/"
+save_dir <- getwd()
 
 # Shared color palette
 nature_colors <- list(
@@ -79,7 +82,7 @@ df_metrics %>% filter(plot_id == 74)
 #      (b) Run paired Wilcoxon test and extract p-value
 #      (c) Draw violin + boxplot + jittered points
 #      (d) Annotate significance bracket (line + stars + p + n)
-#      (e) Return ggplot object (saving handled in Section 6)
+#      (e) Return ggplot object (saving handled in Section 7)
 #
 #    Arguments:
 #      data        — input data frame (df_metrics)
@@ -279,12 +282,64 @@ print(p_scatter)
 
 
 # ------------------------------------------------------------
-# 5. Table S1 — LAC: Spatial vs. Size-based
+# 5. Table S1 — Gini Coefficient Descriptive Statistics
+#
+#    Summarises Mean ± SD for all three Gini metrics across
+#    the 110 quadrats:
+#      · Gini_spatial_obs  — Observed spatial Gini
+#      · Gini_spatial_sim  — Simulated spatial Gini (null model)
+#      · Gini_size         — DBH-based size Gini
+#
+#    The "Mean ± SD" column provides a print-ready string
+#    for direct use in manuscript tables.
+# ------------------------------------------------------------
+table_s1_gini <- df_metrics %>%
+  dplyr::select(Gini_spatial_obs, Gini_spatial_sim, Gini_size) %>%
+  drop_na() %>%
+  summarise(
+    across(
+      everything(),
+      list(
+        Mean = ~round(mean(.x), 3),
+        SD   = ~round(sd(.x),   3),
+        Min  = ~round(min(.x),  3),
+        Max  = ~round(max(.x),  3),
+        N    = ~n()
+      ),
+      .names = "{.col}__{.fn}"
+    )
+  ) %>%
+  # Pivot to long: one row per metric × statistic combination
+  pivot_longer(
+    cols      = everything(),
+    names_to  = c("Variable", "Statistic"),
+    names_sep = "__"
+  ) %>%
+  pivot_wider(names_from = Statistic, values_from = value) %>%
+  mutate(
+    # Human-readable component label
+    Component   = case_when(
+      Variable == "Gini_spatial_obs" ~ "Observed Gini_spatial",
+      Variable == "Gini_spatial_sim" ~ "Simulated Gini_spatial",
+      Variable == "Gini_size"        ~ "Gini_size",
+      TRUE                           ~ Variable
+    ),
+    # Print-ready "Mean ± SD" string for manuscript tables
+    `Mean ± SD` = sprintf("%.3f ± %.3f", Mean, SD)
+  ) %>%
+  dplyr::select(Component, Mean, SD, `Mean ± SD`, Min, Max, N)
+
+cat("\n--- Table S1: Gini Coefficient Summary (n = 110 quadrats) ---\n")
+print(table_s1_gini)
+
+
+# ------------------------------------------------------------
+# 6. Table S2 — LAC: Spatial vs. Size-based
 #
 #    Distinguishes whether inequality arises from the spatial
 #    arrangement or from the underlying size hierarchy.
 # ------------------------------------------------------------
-table_s1 <- df_metrics %>%
+table_s2_lac <- df_metrics %>%
   dplyr::select(LAC_spatial_obs, LAC_size) %>%
   drop_na() %>%
   summarise(
@@ -294,16 +349,20 @@ table_s1 <- df_metrics %>%
     SD_size      = round(sd(LAC_size),           2)
   ) %>%
   {tibble::tibble(
-    Component = c("LAC_spatial_obs", "LAC_size"),
-    Mean      = c(.$Mean_spatial, .$Mean_size),
-    SD        = c(.$SD_spatial,   .$SD_size)
+    Component   = c("LAC_spatial_obs", "LAC_size"),
+    Mean        = c(.$Mean_spatial, .$Mean_size),
+    SD          = c(.$SD_spatial,   .$SD_size),
+    `Mean ± SD` = sprintf("%.2f ± %.2f",
+                          c(.$Mean_spatial, .$Mean_size),
+                          c(.$SD_spatial,   .$SD_size))
   )}
 
-print(table_s1)
+cat("\n--- Table S2: LAC Summary ---\n")
+print(table_s2_lac)
 
 
 # ------------------------------------------------------------
-# 6. Save all outputs
+# 7. Save all outputs
 # ------------------------------------------------------------
 
 # Fig. S2
@@ -316,8 +375,14 @@ ggsave(file.path(save_dir, "FigS3_Gini_Correlation.pdf"),
        p_scatter, width = 89, height = 89,
        units = "mm", dpi = 600, device = cairo_pdf)
 
-# Table S1
+
+# Table S1 & S2 — written to separate sheets in one workbook
 writexl::write_xlsx(
-  list("Table_S1_LAC" = table_s1),
-  path = file.path(save_dir, "TableS1_LAC_Summary.xlsx")
+  list(
+    "Table_S1_Gini_Summary" = table_s1_gini,
+    "Table_S2_LAC_Summary"  = table_s2_lac
+  ),
+  path = file.path(save_dir, "TableS1_S2_Summary.xlsx")
 )
+
+cat("\n✅ All outputs saved to:", save_dir, "\n")

@@ -1,0 +1,7 @@
+"scale","predictor","direct_effect","indirect_effect","total_effect"
+"100 ha","SR",0,0.10710814,0.10710814
+"100 ha","delta_Gini_spatial",-0.3648,0,-0.3648
+"100 ha","Gini_size",-0.2282,0,-0.2282
+"25 ha","SR",0,0.0616721,0.0616721
+"25 ha","delta_Gini_spatial",-0.28,0,-0.28
+"25 ha","Gini_size",-0.2235,0,-0.2235

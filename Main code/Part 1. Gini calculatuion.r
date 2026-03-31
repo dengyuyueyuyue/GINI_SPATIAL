@@ -1,9 +1,7 @@
 ############################################
-##########这个Code主要介绍delta_Gini_spatial 和 Gini_size以及其对应的lorenz asymetric coefficient （S，在代码中用LAC表示）。由于政策原因，仅使用Gird 74作为workflow展示，对应原始过程数据中的grid_id ==74, 由于防止点重复而设置了抖动，
+##########这个Code主要演示看delta_Gini_spatial 和 Gini_size以及其对应的lorenz asymetric coefficient （S，在代码中用LAC表示）。由于政策原因，仅使用Gird 74作为workflow展示，对应原始过程数据中的grid_id ==74, 由于防止点重复而设置了抖动，
 ########## 因此，尽管设置了seed，您在本次计算得出的 Spatial structural diversity 相关指标均可能会与参与计算时使用的数据产生轻微的出入##################  
 ##################  
-
-
 
 # =====================================================================
 # 群落生态学空间格局与大小等级分析 — Demo Version: Quadrat 74
